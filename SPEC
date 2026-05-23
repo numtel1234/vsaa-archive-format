@@ -1,0 +1,51 @@
+VSAA 2.0 specs
+Binary layout:
+  Header:
+    4 bytes  magic("VSAA")
+    2 bytes  version
+      byte 0: major
+      byte 1: minor
+    10 bytes reserved
+
+  Data region
+   raw concatenated data streams
+
+  Index:
+    4 bytes entry count
+      specifies the number of index entries that immediately follow.
+    For each entry:
+      2 bytes path_len
+      path bytes (UTF-8)
+      8 bytes offset
+      8 bytes compressed size
+      8 bytes uncompressed size
+      4 bytes crc
+        Standard CRC-32 (IEEE 802.3) computed over uncompressed file data.
+      1 byte compression
+        0 = NONE (no compression)
+        1 = DEFLATE (raw DEFLATE stream, no zlib or gzip header)
+        Other values are reserved.
+
+  Footer:
+    4 bytes footer_magic("VEND")
+    8 bytes index_offset
+    4 bytes index_size
+      The index_size field limits the index region to a maximum of 2^32−1 bytes.
+
+All multi-byte integers are encoded in little-endian.
+Internal archive path rules:
+  UTF-8 encoded
+  no absolute paths inside
+  no ..
+  no .
+  no empty segments
+  no duplicates
+Offset is relative to beginning of archive file.
+The order of the Header, Data region, Index, and the Footer is specified in this document and must not deviate.
+No alignment padding is used.
+Reserved bytes and values MUST be zeroed out and be rejected.
+
+Security Considerations:
+  Readers SHOULD impose limits on uncompressed size to prevent resource exhaustion.
+  Readers MUST validate all offsets and sizes against file boundaries.
+  Readers MUST validate CRC before returning file contents.

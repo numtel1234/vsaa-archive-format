@@ -1,0 +1,16 @@
+VSAA (Very Simple Random Access Archive)
+
+Implemented in roughly 450 lines of Python code,
+VSAA is a lightweight archive container format designed to be simple and auditable while supporting modern archive features:
+- Streaming reads
+- Efficient random file access
+- Container-only mode(no compression)
+- High compression ratio for simplicity
+- Path safety
+- CRC32 corruption detection
+- Minimal integration friction
+- Cross-platform interoperability
+
+No external dependencies, just download and use.
+
+For reimplementers: the SPEC file contains the complete VSAA format specification.
