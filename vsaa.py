@@ -42,7 +42,7 @@ from enum import Enum as _Enum
 _MAGIC = b"VSAA"
 _FOOTER_MAGIC = b"VEND"
 _DEFAULT_ZLIB_WBITS = -15 #this number is chosen specifically for interop
-DEFAULT_MAX_READ_SIZE = 40 * 1024**3 #this is 40GiB
+DEFAULT_MAX_READ_SIZE = 1 * 1024**3 #this is 1GiB
 MAJ_VERSION = 2 #last major update: changed to use raw DEFLATE
 MIN_VERSION = 0
 
