@@ -43,6 +43,7 @@ _MAGIC = b"VSAA"
 _FOOTER_MAGIC = b"VEND"
 _DEFAULT_ZLIB_WBITS = -15 #this number is chosen specifically for interop
 DEFAULT_MAX_READ_SIZE = 1 * 1024**3 #this is 1GiB
+DEFAULT_COMPRESS_TRESH = 64
 MAJ_VERSION = 2 #last major update: changed to use raw DEFLATE
 MIN_VERSION = 0
 
@@ -159,9 +160,12 @@ def create_archive(archive_path: StrPath, *dirs_or_files: StrPath, compression: 
         # ---- Data region ----
         for arc_path, fs_path in file_iter():
             _validate_path(arc_path)
-            compressor = _CompressorWrapper(compression, level)
-                
+            
             with open(fs_path, "rb") as f:
+                f_size = f.seek(0, _os.SEEK_END)
+                f.seek(0, _os.SEEK_SET)
+                comp = compression if f_size >= DEFAULT_COMPRESS_TRESH else CompressionMode.NONE
+                compressor = _CompressorWrapper(comp, level)
                 offset = out.tell()
                 crc = 0
                 uncompressed_size = 0
@@ -183,7 +187,7 @@ def create_archive(archive_path: StrPath, *dirs_or_files: StrPath, compression: 
                 compressed_size,
                 uncompressed_size,
                 crc & 0xffffffff,
-                compression
+                comp
             ))
 
         # ---- Index ----
