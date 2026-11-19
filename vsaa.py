@@ -150,6 +150,13 @@ def create_archive(archive_path: StrPath, *dirs_or_files: StrPath, compression: 
 
     index: list[tuple[bytes, int, int, int, int, CompressionMode]] = []
 
+    paths: list[tuple[str, str]] = []
+
+    for arc_path, fs_path in file_iter():
+        paths.append((arc_path, fs_path))
+
+    paths.sort(key=lambda t: t[1]) # improve behavior compat with other implementations
+
     with open(archive_path, "wb") as out:
 
         # ---- Header ----
@@ -158,7 +165,7 @@ def create_archive(archive_path: StrPath, *dirs_or_files: StrPath, compression: 
         out.write(b"\x00" * 10)
 
         # ---- Data region ----
-        for arc_path, fs_path in file_iter():
+        for arc_path, fs_path in paths:
             _validate_path(arc_path)
             
             with open(fs_path, "rb") as f:
